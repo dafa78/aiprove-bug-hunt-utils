@@ -1,0 +1,12 @@
+Build transcript — AiProve bug-hunt-utils entry (handle: prab)
+=============================================================
+1. Read the challenge: challenges/bug-hunt-utils from the public AIProveRH/aiprove repo. Entry is a JSON list [{fn, input, expected}]; the grader replays each report against a reference implementation.
+2. Read utils.js (10 functions) and wrote a local Node harness (probe.js) with 81 test cases probing every function, including edge cases (empty inputs, 0/1, negatives, uppercase, emoji/surrogate pairs, decimals).
+3. Results: 67 passed, 14 failed, all failures in 4 functions:
+   - factorial: loop `for(i=2;i<n;i++)` drops n, returns (n-1)! — verified 5->120, 2->2, 10->3628800.
+   - countVowels: regex /[aeiou]/g has no i flag, misses uppercase vowels — verified "AEIOU"->5, "AaEeIiOoUu"->10, "HELLO"->2.
+   - reverse: split("") tears UTF-16 surrogate pairs, corrupting emoji — verified "a😀b"->"b😀a", "😀😃"->"😃😀".
+   - isPalindrome: inherits the reverse bug — verified "a😀a"->true.
+4. Checked and deliberately NOT reported as ambiguous: max([]), average([]), titleCase("don't"), isPalindrome("Racecar"). sum, clamp, unique verified fully correct.
+5. Wrote bugs.json with the 9 verified reports (each re-checked: actual != expected and expected == independent reference output).
+Files: bugs.json, probe.js, README.md, TESTLOG.md. No secrets in any file; nothing spent.
